@@ -8,17 +8,28 @@ namespace OrderProcessing
     {
         static void Main(string[] args)
         {
-            using var context = new ApplicationDbContext(); // Tworzenie DbContext
-            if (context.Database.CanConnect())
+            using var context = new ApplicationDbContext();
+            
+            var orderProcessing = new OrderProcessing(context);
+            var orders = orderProcessing.GetOrders();
+            foreach (var order in orders)
             {
-                Console.WriteLine("Połączenie z bazą danych działa.");
+                Console.WriteLine($"Zamówienie ID: {order.Id},\nProdukt: {order.NameOfProduct}");
+
+                if (order.Statuses != null && order.Statuses.Any())
+                {
+                    foreach (var status in order.Statuses)
+                    {
+                        Console.WriteLine($"- Status: {status.Status},");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("- Brak statusów dla tego zamówienia.");
+                }
+                Console.WriteLine();
             }
-            else
-            {
-                Console.WriteLine("Brak połączenia z bazą.");
-            }
-            var orderProcessing = new OrderProcessing(context); // Przekazanie kontekstu
-            var order = orderProcessing.AddOrder(); // Dodanie zamówienia
+
         }
     }
 }

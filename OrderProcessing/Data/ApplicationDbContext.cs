@@ -17,5 +17,15 @@ namespace OrderProcessing.Data
         }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStatus> OrdersStatuses { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<OrderStatus>()
+                .HasOne(os => os.Order)
+                .WithMany(o => o.Statuses)
+                .HasForeignKey(os => os.OrderId);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

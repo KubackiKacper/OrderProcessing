@@ -10,8 +10,8 @@ using OrderProcessing.Data;
 namespace OrderProcessing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250315143410_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250315161100_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
