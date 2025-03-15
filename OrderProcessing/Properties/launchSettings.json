@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OrderProcessing": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\Projekty\\OrderProcessing\\OrderProcessing"
+    }
+  }
+}
