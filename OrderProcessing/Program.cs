@@ -1,35 +1,64 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderProcessing.Data;
 using OrderProcessing.Models;
-
+using Microsoft.Extensions.DependencyInjection;
+using static System.Net.Mime.MediaTypeNames;
 namespace OrderProcessing
 {
     internal class Program
     {
+
         static void Main(string[] args)
         {
-            using var context = new ApplicationDbContext();
-            
-            var orderProcessing = new OrderProcessing(context);
-            var orders = orderProcessing.GetOrders();
-            foreach (var order in orders)
-            {
-                Console.WriteLine($"Zamówienie ID: {order.Id},\nProdukt: {order.NameOfProduct}");
+            var serviceProvider = new ServiceCollection()
+            .AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite("Data Source=OrderProcessing.db"))
+            .AddSingleton<IOrderProcessing, OrderProcessing>()
+            .BuildServiceProvider();
 
-                if (order.Statuses != null && order.Statuses.Any())
+            var orderProcessing = serviceProvider.GetService<IOrderProcessing>();
+
+            string userInput = "";
+            Console.WriteLine("Welcome to order processing console app!");
+            do
+            {
+                Console.WriteLine("Menu:");
+                Console.WriteLine("1. Place new order.");
+                Console.WriteLine("2. Change order status.");
+                Console.WriteLine("3. Display orders.");
+                Console.WriteLine("4. Exit.");
+                userInput = Console.ReadLine();
+                while (userInput == "")
                 {
-                    foreach (var status in order.Statuses)
-                    {
-                        Console.WriteLine($"- Status: {status.Status},");
-                    }
-                }
-                else
+                    Console.WriteLine("Please enter your choice!");
+                    userInput = Console.ReadLine();
+                };
+                int.TryParse(userInput, out int choice);
+                switch (choice)
                 {
-                    Console.WriteLine("- Brak statusów dla tego zamówienia.");
+                    case 1:
+                        Console.WriteLine("work in progress");
+                        break;
+
+                    case 2:
+                        Console.WriteLine("work in progress");
+                        break;
+
+                    case 3:
+                        orderProcessing.GetOrders();
+                        break;
+
+                    case 4:
+                        return;
+
+                    default:
+                        Console.WriteLine("Invalid choice try again!");
+                        break;
                 }
-                Console.WriteLine();
-            }
+            } while (int.Parse(userInput) != 4);
+
 
         }
+
     }
 }

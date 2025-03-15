@@ -10,8 +10,8 @@ using OrderProcessing.Data;
 namespace OrderProcessing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250315161100_initial")]
-    partial class initial
+    [Migration("20250315203823_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,24 +27,30 @@ namespace OrderProcessing.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("NameOfProduct")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("ProductId")
+                        .HasMaxLength(255)
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("TotalOfOrder")
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TypeOfClient")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TypeOfPayment")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("Orders");
                 });
@@ -69,6 +75,36 @@ namespace OrderProcessing.Migrations
                     b.ToTable("OrdersStatuses");
                 });
 
+            modelBuilder.Entity("OrderProcessing.Models.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("OrderProcessing.Models.Order", b =>
+                {
+                    b.HasOne("OrderProcessing.Models.Product", "Product")
+                        .WithMany("Orders")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("OrderProcessing.Models.OrderStatus", b =>
                 {
                     b.HasOne("OrderProcessing.Models.Order", "Order")
@@ -83,6 +119,11 @@ namespace OrderProcessing.Migrations
             modelBuilder.Entity("OrderProcessing.Models.Order", b =>
                 {
                     b.Navigation("Statuses");
+                });
+
+            modelBuilder.Entity("OrderProcessing.Models.Product", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

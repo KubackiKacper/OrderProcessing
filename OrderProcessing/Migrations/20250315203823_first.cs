@@ -5,26 +5,46 @@
 namespace OrderProcessing.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class first : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ProductName = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    TotalOfOrder = table.Column<decimal>(type: "TEXT", nullable: false),
-                    NameOfProduct = table.Column<string>(type: "TEXT", nullable: false),
-                    TypeOfClient = table.Column<string>(type: "TEXT", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: false),
-                    TypeOfPayment = table.Column<string>(type: "TEXT", nullable: false)
+                    TotalOfOrder = table.Column<decimal>(type: "TEXT", maxLength: 255, nullable: false),
+                    ProductId = table.Column<int>(type: "INTEGER", maxLength: 255, nullable: false),
+                    TypeOfClient = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Address = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    TypeOfPayment = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,6 +68,11 @@ namespace OrderProcessing.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_ProductId",
+                table: "Orders",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrdersStatuses_OrderId",
                 table: "OrdersStatuses",
                 column: "OrderId");
@@ -61,6 +86,9 @@ namespace OrderProcessing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Products");
         }
     }
 }

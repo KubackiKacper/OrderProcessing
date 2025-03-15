@@ -11,21 +11,35 @@ namespace OrderProcessing.Data
 {
     public class ApplicationDbContext : DbContext
     {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions) : base(dbContextOptions)
+        {
+            
+        }
+        public ApplicationDbContext() { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite($"Data Source = OrderProcessing.db");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlite("Data Source=OrderProcessing.db");
+            }
         }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStatus> OrdersStatuses { get; set; }
-
+        public DbSet<Product> Products { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Product>()
+                .HasKey(p => p.Id);
+
             modelBuilder.Entity<OrderStatus>()
                 .HasOne(os => os.Order)
                 .WithMany(o => o.Statuses)
                 .HasForeignKey(os => os.OrderId);
-
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Product)
+                .WithMany(p => p.Orders)
+                .HasForeignKey(o => o.ProductId);
+            
         }
     }
 }
