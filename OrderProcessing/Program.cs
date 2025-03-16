@@ -8,11 +8,13 @@ namespace OrderProcessing
     internal class Program
     {
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var serviceProvider = new ServiceCollection()
             .AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite("Data Source=OrderProcessing.db"))
+                options.UseSqlite("Data Source=OrderProcessing.db")
+                .LogTo(s => System.Diagnostics.Debug.WriteLine(s))
+                .EnableSensitiveDataLogging(true))
             .AddSingleton<IOrderProcessing, OrderProcessing>()
             .BuildServiceProvider();
 
@@ -20,32 +22,40 @@ namespace OrderProcessing
 
             string userInput = "";
             Console.WriteLine("Welcome to order processing console app!");
+            Console.WriteLine("Menu:");
+            Console.WriteLine("1. Place new order.");
+            Console.WriteLine("2. Change order status.");
+            Console.WriteLine("3. Display orders.");
+            Console.WriteLine("4. Exit.");
             do
             {
-                Console.WriteLine("Menu:");
-                Console.WriteLine("1. Place new order.");
-                Console.WriteLine("2. Change order status.");
-                Console.WriteLine("3. Display orders.");
-                Console.WriteLine("4. Exit.");
                 userInput = Console.ReadLine();
-                while (userInput == "")
+                while (string.IsNullOrWhiteSpace(userInput))
                 {
                     Console.WriteLine("Please enter your choice!");
                     userInput = Console.ReadLine();
-                };
-                int.TryParse(userInput, out int choice);
+                }
+
+                if (!int.TryParse(userInput, out int choice))
+                {
+                    Console.WriteLine("Invalid input, please enter a number.");
+                    userInput = Console.ReadLine();
+                }
+
                 switch (choice)
                 {
                     case 1:
-                        Console.WriteLine("work in progress");
+                        //Console.WriteLine("work in progress");
+                        await orderProcessing.PlaceNewOrder();
                         break;
 
                     case 2:
-                        Console.WriteLine("work in progress");
+                        //Console.WriteLine("work in progress");
+                        await orderProcessing.GetProducts();
                         break;
 
-                    case 3:
-                        orderProcessing.GetOrders();
+                    case 3:                        
+                        await orderProcessing.GetOrders();                       
                         break;
 
                     case 4:
@@ -55,10 +65,7 @@ namespace OrderProcessing
                         Console.WriteLine("Invalid choice try again!");
                         break;
                 }
-            } while (int.Parse(userInput) != 4);
-
-
+            } while (true);
         }
-
     }
 }

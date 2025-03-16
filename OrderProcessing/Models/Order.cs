@@ -14,22 +14,25 @@ namespace OrderProcessing.Models
         public int Id { get; set; }
 
         [MaxLength(255)]
-        
+        [Required]
         public decimal TotalOfOrder { get; set; }
 
         [MaxLength(255)]
-        [ForeignKey("Product")]
-        public int ProductId { get; set; }
+        [Required]
+        public string NameOfProducts { get; set; }
 
         [MaxLength(255)]
+        [Required]
         public string TypeOfClient { get; set; }
 
         [MaxLength(255)]
+        [Required]
         public string Address { get; set; }
 
         [MaxLength(255)]
+        [Required]
         public string TypeOfPayment { get; set; }
-        public ICollection<OrderStatus> Statuses { get; set; } = new List<OrderStatus>();
-        public Product Product {  get; set; }
+        public ICollection<OrderStatus> Statuses { get; set; } = new List<OrderStatus>();      
+        public ICollection<OrderProduct> OrdersProducts = new List<OrderProduct>();
     }
 }

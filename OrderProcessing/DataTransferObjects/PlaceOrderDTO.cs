@@ -10,9 +10,8 @@ namespace OrderProcessing.DataTransferObjects
 {
     public class PlaceOrderDTO
     {
-        public decimal TotalOfOrder { get; set; }
-
-        public int ProductId { get; set; }
+        [MaxLength(255)]
+        public string NameOfProducts { get; set; }
 
         [MaxLength(255)]
         public string TypeOfClient { get; set; }

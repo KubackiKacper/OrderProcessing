@@ -11,7 +11,8 @@ namespace OrderProcessing.Models
     {
         
         [Key]
-        public int Id { get; }
+        public int Id { get; set; }
+
         [MaxLength(255)]
         [Required]
         public string ProductName { get; set; }
@@ -19,6 +20,6 @@ namespace OrderProcessing.Models
         [Required]
         public decimal UnitPrice { get; set; }
 
-        public ICollection<Order> Orders = new List<Order>();
+        public ICollection<OrderProduct> OrdersProducts = new List<OrderProduct>();
     }
 }

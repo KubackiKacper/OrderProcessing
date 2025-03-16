@@ -10,7 +10,7 @@ using OrderProcessing.Data;
 namespace OrderProcessing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250315203823_first")]
+    [Migration("20250316160310_first")]
     partial class first
     {
         /// <inheritdoc />
@@ -30,9 +30,10 @@ namespace OrderProcessing.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ProductId")
+                    b.Property<string>("NameOfProducts")
+                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalOfOrder")
                         .HasMaxLength(255)
@@ -50,9 +51,28 @@ namespace OrderProcessing.Migrations
 
                     b.HasKey("Id");
 
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("OrderProcessing.Models.OrderProduct", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("OrderId", "ProductId");
+
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("OrdersProducts");
                 });
 
             modelBuilder.Entity("OrderProcessing.Models.OrderStatus", b =>
@@ -94,13 +114,21 @@ namespace OrderProcessing.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("OrderProcessing.Models.Order", b =>
+            modelBuilder.Entity("OrderProcessing.Models.OrderProduct", b =>
                 {
+                    b.HasOne("OrderProcessing.Models.Order", "Order")
+                        .WithMany("OrdersProducts")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("OrderProcessing.Models.Product", "Product")
-                        .WithMany("Orders")
+                        .WithMany("OrdersProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });
@@ -118,12 +146,14 @@ namespace OrderProcessing.Migrations
 
             modelBuilder.Entity("OrderProcessing.Models.Order", b =>
                 {
+                    b.Navigation("OrdersProducts");
+
                     b.Navigation("Statuses");
                 });
 
             modelBuilder.Entity("OrderProcessing.Models.Product", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("OrdersProducts");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,7 +10,8 @@ namespace OrderProcessing
 {
     public interface IOrderProcessing
     {
-        public Task <GetOrderDTO[]> GetOrders();
-        
+        Task<GetOrderDTO[]> GetOrders();
+        Task<GetProductsDTO[]> GetProducts();
+        Task<PlaceOrderDTO> PlaceNewOrder();
     }
 }

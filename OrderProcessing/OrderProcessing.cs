@@ -19,36 +19,101 @@ namespace OrderProcessing
 
         public async Task<GetOrderDTO[]> GetOrders() 
         {
-            GetOrderDTO[] respone = await _context.Orders.Select(orders => new GetOrderDTO
-            {
-                Id = orders.Id,
-                TotalOfOrder = orders.TotalOfOrder,
-                ProductId = orders.ProductId,
-                TypeOfClient = orders.TypeOfClient,
-                Address = orders.Address,
-                TypeOfPayment = orders.TypeOfPayment,
-                Statuses = orders.Statuses
-            }).ToArrayAsync();
-
-            foreach (var order in respone)
-            {
-                Console.WriteLine($"Order ID: {order.Id},\nProduct: {order.ProductId},\nType Of Client: {order.TypeOfClient}\n" +
-                    $"Address: {order.Address},\nType Of Payment:{order.TypeOfPayment}");
-
-                if (order.Statuses != null && order.Statuses.Any())
+            GetOrderDTO[] response = await _context.Orders
+                .Select(order => new GetOrderDTO
                 {
-                    foreach (var status in order.Statuses)
+                    Id = order.Id,
+                    TotalOfOrder = order.TotalOfOrder,
+                    NameOfProducts = string.Join(", ", order.OrdersProducts.Select(op => op.Product.ProductName)), // Pobieranie nazw produktów
+                    TypeOfClient = order.TypeOfClient,
+                    Address = order.Address,
+                    TypeOfPayment = order.TypeOfPayment,
+                    Statuses = order.Statuses.ToList()
+                }).ToArrayAsync();
+
+                foreach (var order in response)
+                {
+                    Console.WriteLine($"Order ID: {order.Id},\nProducts: {order.NameOfProducts},\nType Of Client: {order.TypeOfClient}\n" +
+                                        $"Address: {order.Address},\nType Of Payment: {order.TypeOfPayment}");
+
+                    if (order.Statuses != null && order.Statuses.Any())
                     {
-                        Console.WriteLine($"Status: {status.Status}");
+                        foreach (var status in order.Statuses)
+                        {
+                            Console.WriteLine($"Status: {status.Status}");
+                        }
                     }
+                    else
+                    {
+                        Console.WriteLine("No status available!");
+                    }
+                    Console.WriteLine();
+                }
+                return response;
+        }  
+        public async Task<GetProductsDTO[]> GetProducts()
+        {
+            GetProductsDTO[] response = await _context.Products
+                .Select(product => new GetProductsDTO
+                {
+                    Id = product.Id,
+                    UnitPrice = product.UnitPrice,
+                    ProductName = product.ProductName
+                }).ToArrayAsync();
+            foreach (var product in response)
+            {
+                Console.WriteLine($"{product.Id}. Name: {product.ProductName}, Price:{product.UnitPrice}");
+            }
+            return response;
+        }
+        public async Task<PlaceOrderDTO> PlaceNewOrder()
+        {
+            Console.Clear();
+            Console.WriteLine("Specify, witch product would You like to order");
+
+            await GetProducts();
+            string userChoice;
+            Product product;
+            userChoice = Console.ReadLine();
+            while (string.IsNullOrEmpty(userChoice))
+            {
+                Console.WriteLine("Invalid product, please select again");
+                userChoice = Console.ReadLine();
+            }
+            if (!int.TryParse(userChoice, out int choice))
+            {
+                Console.WriteLine("Invalid input, please enter a number.");
+                userChoice = Console.ReadLine();
+            }
+            do
+            {
+                product = await _context.Products.FirstOrDefaultAsync(product => product.Id == choice);
+                if (product == null)
+                {
+                    Console.WriteLine("Product not found. Please try again.");
+                    userChoice= Console.ReadLine();
                 }
                 else
                 {
-                    Console.WriteLine("No status available!");
+                    continue;
                 }
-                Console.WriteLine();
+            } while (product == null);
+
+            string quantity;
+            Console.WriteLine("Provide quantity number:");
+            quantity = Console.ReadLine();
+            while (string.IsNullOrEmpty(quantity))
+            {
+                Console.WriteLine("Invalid product, please select again");
+                quantity = Console.ReadLine();
             }
-            return respone;
-        }        
+            if (!int.TryParse(userChoice, out int userQuantity))
+            {
+                Console.WriteLine("Invalid input, please enter a number.");
+                quantity = Console.ReadLine();
+            }
+
+            return null;
+        }
     }
 }
