@@ -2,7 +2,7 @@
 using OrderProcessing.Data;
 using OrderProcessing.Models;
 using Microsoft.Extensions.DependencyInjection;
-using static System.Net.Mime.MediaTypeNames;
+
 namespace OrderProcessing
 {
     internal class Program
@@ -30,19 +30,9 @@ namespace OrderProcessing
             do
             {
                 userInput = Console.ReadLine();
-                while (string.IsNullOrWhiteSpace(userInput))
-                {
-                    Console.WriteLine("Please enter your choice!");
-                    userInput = Console.ReadLine();
-                }
+                int validationOfUserinput = Validate.ValidateUserInput(userInput);
 
-                if (!int.TryParse(userInput, out int choice))
-                {
-                    Console.WriteLine("Invalid input, please enter a number.");
-                    userInput = Console.ReadLine();
-                }
-
-                switch (choice)
+                switch (validationOfUserinput)
                 {
                     case 1:
                         //Console.WriteLine("work in progress");
@@ -59,6 +49,7 @@ namespace OrderProcessing
                         break;
 
                     case 4:
+                        Console.WriteLine("Exiting program...");
                         return;
 
                     default:
@@ -66,6 +57,6 @@ namespace OrderProcessing
                         break;
                 }
             } while (true);
-        }
+        }        
     }
 }

@@ -28,7 +28,6 @@ namespace OrderProcessing.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NameOfProducts")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 

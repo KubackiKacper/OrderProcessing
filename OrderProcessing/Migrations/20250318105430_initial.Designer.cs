@@ -10,8 +10,8 @@ using OrderProcessing.Data;
 namespace OrderProcessing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250316160310_first")]
-    partial class first
+    [Migration("20250318105430_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,7 +31,6 @@ namespace OrderProcessing.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NameOfProducts")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 

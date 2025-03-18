@@ -5,7 +5,7 @@
 namespace OrderProcessing.Migrations
 {
     /// <inheritdoc />
-    public partial class first : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,7 @@ namespace OrderProcessing.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     TotalOfOrder = table.Column<decimal>(type: "TEXT", maxLength: 255, nullable: false),
-                    NameOfProducts = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    NameOfProducts = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     TypeOfClient = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Address = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     TypeOfPayment = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false)

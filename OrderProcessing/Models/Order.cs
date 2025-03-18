@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace OrderProcessing.Models
 {
     public class Order
     {
+    #nullable enable
         [Key]
         public int Id { get; set; }
 
@@ -18,8 +20,8 @@ namespace OrderProcessing.Models
         public decimal TotalOfOrder { get; set; }
 
         [MaxLength(255)]
-        [Required]
-        public string NameOfProducts { get; set; }
+        [AllowNull]
+        public string? NameOfProducts { get; set; }
 
         [MaxLength(255)]
         [Required]

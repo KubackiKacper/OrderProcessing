@@ -9,11 +9,14 @@ using OrderProcessing.Models;
 
 namespace OrderProcessing.DataTransferObjects
 {
-    public class OrderStatusDTO
+    internal class OrderProductDTO
     {
+        public int ProductId { get; set; }
+        public Product Product { get; set; }
+
         public int OrderId { get; set; }
         public Order Order { get; set; }
 
-        public string Status { get; set; }
+        public int Quantity { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace OrderProcessing.DataTransferObjects
     public class PlaceOrderDTO
     {
         [MaxLength(255)]
-        public string NameOfProducts { get; set; }
+        public string? NameOfProducts { get; set; }
 
         [MaxLength(255)]
         public string TypeOfClient { get; set; }

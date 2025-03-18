@@ -14,7 +14,7 @@ namespace OrderProcessing.DataTransferObjects
 
         public decimal TotalOfOrder { get; set; }
 
-        public string NameOfProducts { get; set; }
+        public string? NameOfProducts { get; set; }
 
         public string TypeOfClient { get; set; }
 
