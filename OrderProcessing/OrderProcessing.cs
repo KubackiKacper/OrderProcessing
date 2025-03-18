@@ -79,38 +79,53 @@ namespace OrderProcessing
             Console.Clear();
             Console.WriteLine("Specify, which product would You like to order");
 
-            await GetProducts();
-            string userChoice;
-            Product product;
-            userChoice = Console.ReadLine();
-            int validationOfUserChoice = Validate.ValidateUserInput(userChoice);
+            List<OrderProduct> orderProducts = new List<OrderProduct>();
+            Dictionary<int, int> productQuantities = new Dictionary<int, int>();
+            List<string> orderedProductNames = new List<string>();
+
+            string addMoreProducts;
             do
             {
-                product = await _context.Products.FirstOrDefaultAsync(product => product.Id == validationOfUserChoice);
-                if (product == null)
+                await GetProducts();
+                string userChoice;
+                Product product;
+                do
                 {
-                    Console.WriteLine("Product not found. Please try again.");
-                    userChoice= Console.ReadLine();
+                    userChoice = Console.ReadLine();
+                    int validationOfUserChoice = Validate.ValidateUserInput(userChoice);
+                    product = await _context.Products.FirstOrDefaultAsync(p => p.Id == validationOfUserChoice);
+                    if (product == null)
+                    {
+                        Console.WriteLine("Product not found. Please try again.");
+                    }
+                } while (product == null);
+
+                Console.WriteLine("Provide quantity number:");
+                string quantity = Console.ReadLine();
+                int validationOfQuantity = Validate.ValidateUserInput(quantity);
+                if (productQuantities.ContainsKey(product.Id))
+                {
+                    productQuantities[product.Id] += validationOfQuantity;
                 }
                 else
                 {
-                    continue;
+                    productQuantities.Add(product.Id, validationOfQuantity);
                 }
-            } while (product == null);
 
-            string quantity;
-            Console.WriteLine("Provide quantity number:");
-            quantity = Console.ReadLine();
-            int validationOfQuantity = Validate.ValidateUserInput(quantity);
+                Console.WriteLine("Would you like to add another product? (yes/no)");
+                addMoreProducts = Console.ReadLine()?.Trim().ToLower();
+            } while (addMoreProducts == "yes");
 
-            string address;
             Console.WriteLine("Please provide shipping address:");
-            address = Console.ReadLine();
-            while (string.IsNullOrEmpty(address))
+            string address;
+            do
             {
-                Console.WriteLine("Address is required for proper shipment!");
-                address = Console.ReadLine();                
-            };
+                address = Console.ReadLine();
+                if (string.IsNullOrEmpty(address))
+                {
+                    Console.WriteLine("Address is required for proper shipment!");
+                }
+            } while (string.IsNullOrEmpty(address));
 
             Dictionary<int, string> paymentOptions = new Dictionary<int, string>
             {
@@ -123,7 +138,7 @@ namespace OrderProcessing
             Dictionary<int, string> clientType = new Dictionary<int, string>
             {
                 { 1, "Individual" },
-                { 2, "Buisness" }
+                { 2, "Business" }
             };
             int selectedTypeOfClient = Validate.ValidateChoice("What type of client are You?", clientType);
             string typeOfClient = clientType[selectedTypeOfClient];
@@ -132,70 +147,75 @@ namespace OrderProcessing
             {
                 try
                 {
-                    PlaceOrderDTO placeOrderDTO = new PlaceOrderDTO
+                    Order order = new Order
                     {
                         TypeOfClient = typeOfClient,
                         Address = address,
                         TypeOfPayment = typeOfPayment
                     };
-                    Order order = new Order
-                    {
-                        TypeOfClient = placeOrderDTO.TypeOfClient,
-                        Address = placeOrderDTO.Address,
-                        TypeOfPayment = placeOrderDTO.TypeOfPayment
-                    };
                     _context.Orders.Add(order);
                     await _context.SaveChangesAsync();
 
-                    OrderProductDTO orderProductDTO = new OrderProductDTO
+                    decimal totalOrderPrice = 0;
+                    foreach (var kvp in productQuantities)
                     {
-                        ProductId = product.Id,
-                        OrderId = order.Id,
-                        Quantity = validationOfQuantity
-                    };
+                        int productId = kvp.Key;
+                        int quantity = kvp.Value;
 
-                    OrderProduct orderProduct = new OrderProduct
-                    {
-                        ProductId = orderProductDTO.ProductId,
-                        OrderId = orderProductDTO.OrderId,
-                        Quantity = orderProductDTO.Quantity
-                    };
-                    _context.OrdersProducts.Add(orderProduct);
+                        Product product = await _context.Products.FindAsync(productId);
+                        if (product != null)
+                        {
+                            totalOrderPrice += product.UnitPrice * quantity;
+                            orderedProductNames.Add($"{product.ProductName} (x{quantity})");
+
+                            OrderProduct existingOrderProduct = await _context.OrdersProducts
+                                .FirstOrDefaultAsync(op => op.OrderId == order.Id && op.ProductId == productId);
+
+                            if (existingOrderProduct != null)
+                            {
+                                existingOrderProduct.Quantity += quantity;
+                            }
+                            else
+                            {
+                                _context.OrdersProducts.Add(new OrderProduct
+                                {
+                                    OrderId = order.Id,
+                                    ProductId = productId,
+                                    Quantity = quantity
+                                });
+                            }
+                        }
+                    }
                     await _context.SaveChangesAsync();
 
-                    OrderStatusDTO orderStatusDTO = new OrderStatusDTO
+                    OrderStatus orderStatus = new OrderStatus
                     {
                         OrderId = order.Id,
                         Status = "New"
                     };
-                    OrderStatus orderStatus = new OrderStatus
-                    {
-                        OrderId = orderStatusDTO.OrderId,
-                        Status = orderStatusDTO.Status
-                    };
                     _context.OrdersStatuses.Add(orderStatus);
                     await _context.SaveChangesAsync();
 
-                    Order updateOrder = await _context.Orders.FindAsync(order.Id);
-                    updateOrder.TotalOfOrder = product.UnitPrice * validationOfQuantity;
-                    updateOrder.NameOfProducts = string.Join(", ", order.OrdersProducts
-                        .Select(op => op.Product.ProductName));
+                    order.TotalOfOrder = totalOrderPrice;
+                    order.NameOfProducts = string.Join(", ", orderedProductNames);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
-                    Console.WriteLine("Order placed successfully!");
+
+                    Console.WriteLine("Order placed successfully!\n");
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
                     Console.WriteLine($"Unexpected error: {ex.Message}");
                 }
-;            }
-            Console.WriteLine("Menu:");
+            }
+            Console.WriteLine("What would you like to do next?");
             Console.WriteLine("1. Place new order.");
             Console.WriteLine("2. Change order status.");
             Console.WriteLine("3. Display orders.");
             Console.WriteLine("4. Exit.");
             return null;
         }
+
     }
 }
