@@ -13,5 +13,6 @@ namespace OrderProcessing
         Task<GetOrderDTO[]> GetOrders();
         Task<GetProductsDTO[]> GetProducts();
         Task<PlaceOrderDTO> PlaceNewOrder();
+        Task<GetOrderDTO[]> UpdateOrderStatus();
     }
 }

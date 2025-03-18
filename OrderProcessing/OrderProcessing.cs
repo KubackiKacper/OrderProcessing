@@ -217,5 +217,85 @@ namespace OrderProcessing
             return null;
         }
 
+        public async Task<GetOrderDTO[]> UpdateOrderStatus()
+        {
+            Console.Clear();
+            Console.WriteLine("Select order to update it's status");
+
+            GetOrderDTO[] response = await _context.Orders
+                .Select(order => new GetOrderDTO
+                {
+                    Id = order.Id,
+                    Statuses = order.Statuses,
+                    TotalOfOrder = order.TotalOfOrder,
+                }).ToArrayAsync();
+            foreach (var order in response)
+            {
+                Console.Write($"Id: {order.Id} ");
+                foreach (var status in order.Statuses)
+                {
+                    Console.Write($"Status: {status.Status}\n");
+                }
+            }            
+            Dictionary<int, string> statusType = new Dictionary<int, string>
+            {
+                { 1, "In Magazine" },
+                { 2, "In Delivery" },
+                { 3, "Returned To Client" },
+                { 4, "Error" },
+                { 5, "Closed" },
+            };
+            
+            string pickedOrder;
+            pickedOrder = Console.ReadLine();
+            int orderToUpdate = Validate.ValidateUserInput(pickedOrder);
+            Order selectedOrder = await _context.Orders
+                                .FirstOrDefaultAsync(o => o.Id == orderToUpdate);
+            string selectedStatus;
+            if (selectedOrder != null)
+            {
+                Console.WriteLine("Available statuses:");
+                foreach (var kvp in statusType)
+                {                    
+                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                }
+                selectedStatus = Console.ReadLine();
+                int selectedStatusKey = Validate.ValidateUserInput(selectedStatus);
+                if (statusType.TryGetValue(selectedStatusKey, out string newStatus))
+                {
+                    OrderStatus latestStatus = selectedOrder.Statuses.OrderByDescending(s => s.Id).FirstOrDefault();
+
+                    if (latestStatus != null)
+                    {
+                        latestStatus.Status = newStatus;
+                    }
+                    else
+                    {
+                        selectedOrder.Statuses.Add(new OrderStatus
+                        {
+                            OrderId = selectedOrder.Id,
+                            Status = newStatus
+                        });
+                    }
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("Order status updated successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid status selection.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Order not found.");
+            }
+            Console.WriteLine("What would you like to do next?");
+            Console.WriteLine("1. Place new order.");
+            Console.WriteLine("2. Change order status.");
+            Console.WriteLine("3. Display orders.");
+            Console.WriteLine("4. Exit.");
+            return null;
+        }
+
     }
 }

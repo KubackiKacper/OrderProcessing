@@ -41,7 +41,7 @@ namespace OrderProcessing
 
                     case 2:
                         //Console.WriteLine("work in progress");
-                        await orderProcessing.GetProducts();
+                        await orderProcessing.UpdateOrderStatus();
                         break;
 
                     case 3:                        
