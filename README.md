@@ -3,7 +3,8 @@
 - WARNING!
 - IN ORDER TO DEBUG THIS APPLICATION YOU WILL HAVE TO MODIFY launchSettings.JSON FILE
 - YOU HAVE TO UPDATE workingDirectory OF THE APPLICATION TO THE DIRECTORY THAT REPOSITORY WAS CLONED!
-! Example: If repository was cloned to desktop, workingDirectory should be: "workingDirectory":"C:\Users\UserName\Desktop"
+! Example: If repository was cloned to desktop, workingDirectory should be: 
+! "workingDirectory":"C:\Users\UserName\Desktop"
 ```
 ### This is my implementation for the recruitment task, and I have ensured that all the specified criteria are met. The application is designed to handle orders and store data efficiently using an SQLite database file. The database file is created and managed seamlessly, providing persistent storage for order information, products, and statuses. The application ensures the correct manipulation and retrieval of data.
 
