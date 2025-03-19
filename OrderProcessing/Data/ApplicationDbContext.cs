@@ -32,6 +32,23 @@ namespace OrderProcessing.Data
             modelBuilder.Entity<Product>()
                 .HasKey(p => p.Id);
 
+            modelBuilder.Entity<Product>()
+                .HasData
+                    (
+                        new Product
+                        {
+                            Id = 1,
+                            ProductName = "Example1",
+                            UnitPrice = 10.25m
+                        },
+                        new Product
+                        {
+                            Id = 2,
+                            ProductName = "Example2",
+                            UnitPrice = 250.14m
+                        }
+                    );
+
             modelBuilder.Entity<Order>()
                 .HasKey(o => o.Id);
 

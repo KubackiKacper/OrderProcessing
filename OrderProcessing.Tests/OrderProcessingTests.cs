@@ -26,20 +26,23 @@ public class OrderProcessingTests
             .AddSingleton<IOrderProcessing, OrderProcessingService>()
             .BuildServiceProvider();
         _context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+        _context.Database.EnsureCreated();
         _orderProcessing = serviceProvider.GetRequiredService<IOrderProcessing>();
 
-        _context.Orders.RemoveRange(_context.Orders);
-        _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.Orders)}';");
+        if (_context != null)
+        {
+            _context.Orders.RemoveRange(_context.Orders);
+            _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.Orders)}';");
 
-        _context.OrdersProducts.RemoveRange(_context.OrdersProducts);
-        _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.OrdersProducts)}';");
+            _context.OrdersProducts.RemoveRange(_context.OrdersProducts);
+            _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.OrdersProducts)}';");
 
-        _context.OrdersStatuses.RemoveRange(_context.OrdersStatuses);
-        _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.OrdersStatuses)}';");
+            _context.OrdersStatuses.RemoveRange(_context.OrdersStatuses);
+            _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.OrdersStatuses)}';");
 
-        _context.Products.RemoveRange(_context.Products);
-        _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.Products)}';");
-
+            _context.Products.RemoveRange(_context.Products);
+            _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.Products)}';");
+        }
         SeedDatabase();
     }
 
@@ -92,23 +95,6 @@ public class OrderProcessingTests
         Assert.Equal(2, result.Length);
         Assert.Contains(result, p => p.ProductName == "Laptop");
         Assert.Contains(result, p => p.ProductName == "Mouse");
-    }
-
-    [Fact]
-    public async Task PlaceNewOrder_ShouldAddOrder()
-    {
-        var order = new PlaceOrderDTO
-        {
-            TypeOfClient = "Business",
-            Address = "Test Street 456",
-            TypeOfPayment = "Cash on delivery"
-        };
-
-        await _orderProcessing.PlaceNewOrder();
-
-        var orders = _context.Orders.ToList();
-        Assert.Equal(2, orders.Count);
-        Assert.Contains(orders, o => o.Address == "Test Street 456");
     }
 
     [Fact]

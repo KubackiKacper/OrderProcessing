@@ -2,6 +2,8 @@
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace OrderProcessing.Migrations
 {
     /// <inheritdoc />
@@ -67,7 +69,6 @@ namespace OrderProcessing.Migrations
                 {
                     ProductId = table.Column<int>(type: "INTEGER", nullable: false),
                     OrderId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -85,6 +86,15 @@ namespace OrderProcessing.Migrations
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Products",
+                columns: new[] { "Id", "ProductName", "UnitPrice" },
+                values: new object[,]
+                {
+                    { 1, "Example1", 10.25m },
+                    { 2, "Example2", 250.14m }
                 });
 
             migrationBuilder.CreateIndex(

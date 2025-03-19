@@ -2,7 +2,7 @@
   "profiles": {
     "OrderProcessing": {
         "commandName": "Project",
-        "workingDirectory": "C:\\Users\\kuk805\\Desktop\\OrderProcessing\\OrderProcessing"
+        "workingDirectory": "CHANGE TO DIRECTORY OF CLONED REPOSITORY"
     }
   }
 }

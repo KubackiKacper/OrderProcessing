@@ -20,7 +20,6 @@ namespace OrderProcessing
 
         public async Task<GetOrderDTO[]> GetOrders() 
         {
-            //Console.Clear();
             GetOrderDTO[] response = await _context.Orders
                 .Select(order => new GetOrderDTO
                 {
@@ -32,12 +31,25 @@ namespace OrderProcessing
                     TypeOfPayment = order.TypeOfPayment,
                     Statuses = order.Statuses.ToList()
                 }).ToArrayAsync();
-
+            if (!response.Any())
+            {
+                Console.WriteLine("There is no orders at the moment!");
+                DisplayMenu.ShowMenu();
+                return null;
+            }
+            else
+            {
                 foreach (var order in response)
                 {
-                    Console.WriteLine($"Order ID: {order.Id},\nProducts: {order.NameOfProducts},\nType Of Client: {order.TypeOfClient}\n" +
-                                        $"Address: {order.Address},\nType Of Payment: {order.TypeOfPayment}\n" +
-                                        $"Total Of order: {order.TotalOfOrder}");
+                    Console.WriteLine
+                    (
+                         $"Order ID: {order.Id},\n" +
+                         $"Products: {order.NameOfProducts},\n" +
+                         $"Type Of Client: {order.TypeOfClient}\n" +
+                         $"Address: {order.Address},\n" +
+                         $"Type Of Payment: {order.TypeOfPayment}\n" +
+                         $"Total Of order: {order.TotalOfOrder}"
+                    );
 
                     if (order.Statuses != null && order.Statuses.Any())
                     {
@@ -52,12 +64,9 @@ namespace OrderProcessing
                     }
                     Console.WriteLine();
                 }
-            Console.WriteLine("Menu:");
-            Console.WriteLine("1. Place new order.");
-            Console.WriteLine("2. Change order status.");
-            Console.WriteLine("3. Display orders.");
-            Console.WriteLine("4. Exit.");
-            return response;
+                DisplayMenu.ShowMenu();
+                return response;
+            }
         }  
         public async Task<GetProductsDTO[]> GetProducts()
         {
@@ -70,19 +79,20 @@ namespace OrderProcessing
                 }).ToArrayAsync();
             foreach (var product in response)
             {
-                Console.WriteLine($"{product.Id}. Name: {product.ProductName}, Price:{product.UnitPrice}");
+                Console.WriteLine
+                    (
+                        $"{product.Id}. Name: {product.ProductName}, Price:{product.UnitPrice}"
+                    );
             }
             return response;
         }
         public async Task<PlaceOrderDTO> PlaceNewOrder()
         {
-            //Console.Clear();
             Console.WriteLine("Specify, which product would You like to order");
 
             List<OrderProduct> orderProducts = new List<OrderProduct>();
             Dictionary<int, int> productQuantities = new Dictionary<int, int>();
             List<string> orderedProductNames = new List<string>();
-
             string addMoreProducts;
             do
             {
@@ -93,16 +103,18 @@ namespace OrderProcessing
                 {
                     userChoice = Console.ReadLine();
                     int validationOfUserChoice = Validate.ValidateUserInput(userChoice);
-                    product = await _context.Products.FirstOrDefaultAsync(p => p.Id == validationOfUserChoice);
+                    product = await _context.Products
+                        .FirstOrDefaultAsync(p => p.Id == validationOfUserChoice);
                     if (product == null)
                     {
                         Console.WriteLine("Product not found. Please try again.");
                     }
-                } while (product == null);
+                }while (product == null);
 
                 Console.WriteLine("Provide quantity number:");
                 string quantity = Console.ReadLine();
                 int validationOfQuantity = Validate.ValidateUserInput(quantity);
+
                 if (productQuantities.ContainsKey(product.Id))
                 {
                     productQuantities[product.Id] += validationOfQuantity;
@@ -111,10 +123,9 @@ namespace OrderProcessing
                 {
                     productQuantities.Add(product.Id, validationOfQuantity);
                 }
-
                 Console.WriteLine("Would you like to add another product? (yes/no)");
                 addMoreProducts = Console.ReadLine()?.Trim().ToLower();
-            } while (addMoreProducts == "yes");
+            }while (addMoreProducts == "yes");
 
             Console.WriteLine("Please provide shipping address:");
             string address;
@@ -125,7 +136,7 @@ namespace OrderProcessing
                 {
                     Console.WriteLine("Address is required for proper shipment!");
                 }
-            } while (string.IsNullOrEmpty(address));
+            }while (string.IsNullOrEmpty(address));
 
             Dictionary<int, string> paymentOptions = new Dictionary<int, string>
             {
@@ -155,14 +166,13 @@ namespace OrderProcessing
                     };
                     _context.Orders.Add(order);
                     await _context.SaveChangesAsync();
-
                     decimal totalOrderPrice = 0;
                     foreach (var kvp in productQuantities)
                     {
                         int productId = kvp.Key;
                         int quantity = kvp.Value;
-
-                        Product product = await _context.Products.FindAsync(productId);
+                        Product product = await _context.Products
+                            .FindAsync(productId);
                         if (product != null)
                         {
                             totalOrderPrice += product.UnitPrice * quantity;
@@ -170,7 +180,6 @@ namespace OrderProcessing
 
                             OrderProduct existingOrderProduct = await _context.OrdersProducts
                                 .FirstOrDefaultAsync(op => op.OrderId == order.Id && op.ProductId == productId);
-
                             if (existingOrderProduct != null)
                             {
                                 existingOrderProduct.Quantity += quantity;
@@ -187,7 +196,6 @@ namespace OrderProcessing
                         }
                     }
                     await _context.SaveChangesAsync();
-
                     OrderStatus orderStatus = new OrderStatus
                     {
                         OrderId = order.Id,
@@ -210,18 +218,11 @@ namespace OrderProcessing
                 }
             }
             Console.WriteLine("What would you like to do next?");
-            Console.WriteLine("1. Place new order.");
-            Console.WriteLine("2. Change order status.");
-            Console.WriteLine("3. Display orders.");
-            Console.WriteLine("4. Exit.");
+            DisplayMenu.ShowMenu();
             return null;
         }
-
         public async Task<GetOrderDTO[]> UpdateOrderStatus()
         {
-            //Console.Clear();
-            Console.WriteLine("Select order to update it's status");
-
             GetOrderDTO[] response = await _context.Orders
                 .Select(order => new GetOrderDTO
                 {
@@ -230,85 +231,91 @@ namespace OrderProcessing
                     TotalOfOrder = order.TotalOfOrder,
                     TypeOfPayment = order.TypeOfPayment,
                 }).ToArrayAsync();
-            foreach (var order in response)
+            if (!response.Any())
             {
-                Console.Write($"Id: {order.Id} ");
-                foreach (var status in order.Statuses)
-                {
-                    Console.Write($"Status: {status.Status}\n");
-                }
-            }            
-            Dictionary<int, string> statusType = new Dictionary<int, string>
-            {
-                { 1, "In Magazine" },
-                { 2, "In Delivery" },
-                { 3, "Returned To Client" },
-                { 4, "Error" },
-                { 5, "Closed" },
-            };
-            
-            string pickedOrder;
-            pickedOrder = Console.ReadLine();
-            int orderToUpdate = Validate.ValidateUserInput(pickedOrder);
-            Order selectedOrder = await _context.Orders
-                                .FirstOrDefaultAsync(o => o.Id == orderToUpdate);
-            string selectedStatus;
-            if (selectedOrder != null)
-            {
-                Console.WriteLine("Available statuses:");
-                foreach (var kvp in statusType)
-                {                    
-                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-                }
-                selectedStatus = Console.ReadLine();
-                int selectedStatusKey = Validate.ValidateUserInput(selectedStatus);
-                if (statusType.TryGetValue(selectedStatusKey, out string newStatus))
-                {
-                    OrderStatus latestStatus = selectedOrder.Statuses.OrderByDescending(s => s.Id).FirstOrDefault();
-
-                    if (latestStatus != null)
-                    {
-                        latestStatus.Status = newStatus;
-                        if (newStatus == statusType[1] && selectedOrder.TotalOfOrder >= 2500)
-                        {
-                            if (selectedOrder.TypeOfPayment == "Cash on delivery")
-                            {
-                                Console.WriteLine("Order can not be proceeded. It will be returned to client!");
-                                latestStatus.Status = statusType[3];
-                            }
-
-                        }
-                        if (newStatus == statusType[2])
-                        {
-                            Console.WriteLine("Order will be sent.");
-                            Thread.Sleep(2000);
-                            Console.WriteLine("Order was send to client!");
-                            latestStatus.Status = "Sent";
-                        }
-                    }
-                    else
-                    {
-                        latestStatus.Status = statusType[5];
-                    }
-                    await _context.SaveChangesAsync();
-                    Console.WriteLine("Order status updated successfully.");
-                }
-                else
-                {
-                    Console.WriteLine("Invalid status selection.");
-                }
+                Console.WriteLine("There is no orders to update status!");
+                DisplayMenu.ShowMenu();
+                return null;
             }
             else
             {
-                Console.WriteLine("Order not found.");
-            }
-            Console.WriteLine("What would you like to do next?");
-            Console.WriteLine("1. Place new order.");
-            Console.WriteLine("2. Change order status.");
-            Console.WriteLine("3. Display orders.");
-            Console.WriteLine("4. Exit.");
-            return null;
-        }
+                Console.WriteLine("Select order to update it's status");            
+                foreach (var order in response)
+                {
+                    Console.Write($"Id: {order.Id} ");
+                    foreach (var status in order.Statuses)
+                    {
+                        Console.Write($"Status: {status.Status}\n");
+                    }
+                }            
+                Dictionary<int, string> statusType = new Dictionary<int, string>
+                {
+                    { 1, "In Magazine" },
+                    { 2, "In Delivery" },
+                    { 3, "Returned To Client" },
+                    { 4, "Error" },
+                    { 5, "Closed" },
+                };            
+                string pickedOrder;
+                pickedOrder = Console.ReadLine();
+                int orderToUpdate = Validate.ValidateUserInput(pickedOrder);
+                Order selectedOrder = await _context.Orders
+                                    .FirstOrDefaultAsync(o => o.Id == orderToUpdate);
+                string selectedStatus;
+                if (selectedOrder != null)
+                {
+                    Console.WriteLine("Available statuses:");
+                    foreach (var kvp in statusType)
+                    {                    
+                        Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                    }
+                    selectedStatus = Console.ReadLine();
+                    int selectedStatusKey = Validate.ValidateUserInput(selectedStatus);
+                    if (statusType.TryGetValue(selectedStatusKey, out string newStatus))
+                    {
+                        OrderStatus latestStatus = selectedOrder.Statuses
+                            .OrderByDescending(s => s.Id)
+                            .FirstOrDefault();
+                        if (latestStatus != null)
+                        {
+                            latestStatus.Status = newStatus;
+                            if (newStatus == statusType[1] && selectedOrder.TotalOfOrder >= 2500)
+                            {
+                                if (selectedOrder.TypeOfPayment == "Cash on delivery")
+                                {
+                                    Console.WriteLine("Order can not be proceeded. It will be returned to client!");
+                                    latestStatus.Status = statusType[3];
+                                }
 
+                            }
+                            if (newStatus == statusType[2])
+                            {
+                                Console.WriteLine("Order will be sent.");
+                                Thread.Sleep(2000);
+                                Console.WriteLine("Order was send to client!");
+                                latestStatus.Status = "Sent";
+                            }
+                        }
+                        else
+                        {
+                            latestStatus.Status = statusType[5];
+                        }
+                        await _context.SaveChangesAsync();
+                        Console.WriteLine("Order status updated successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid status selection.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Order not found.");
+                }
+                Console.WriteLine("What would you like to do next?");
+                DisplayMenu.ShowMenu();
+                return null;
+            }
+        }
     }
 }

@@ -15,8 +15,8 @@ namespace OrderProcessing
                 Console.WriteLine("Please enter your choice!");
                 userInput = Console.ReadLine();
             }
-
-            if (!int.TryParse(userInput, out int choice))
+            int choice;
+            while(!int.TryParse(userInput, out choice))
             {
                 Console.WriteLine("Invalid input, please enter a number.");
                 userInput = Console.ReadLine();

@@ -58,9 +58,6 @@ namespace OrderProcessing.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
@@ -108,6 +105,20 @@ namespace OrderProcessing.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ProductName = "Example1",
+                            UnitPrice = 10.25m
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ProductName = "Example2",
+                            UnitPrice = 250.14m
+                        });
                 });
 
             modelBuilder.Entity("OrderProcessing.Models.OrderProduct", b =>

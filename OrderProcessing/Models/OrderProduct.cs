@@ -10,9 +10,6 @@ namespace OrderProcessing.Models
 {
     public class OrderProduct
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
         [ForeignKey("Product")]
         public int ProductId { get; set; }

@@ -22,11 +22,7 @@ namespace OrderProcessing
 
             string userInput = "";
             Console.WriteLine("Welcome to order processing console app!");
-            Console.WriteLine("Menu:");
-            Console.WriteLine("1. Place new order.");
-            Console.WriteLine("2. Change order status.");
-            Console.WriteLine("3. Display orders.");
-            Console.WriteLine("4. Exit.");
+            DisplayMenu.ShowMenu();
             do
             {
                 userInput = Console.ReadLine();
