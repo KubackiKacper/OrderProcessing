@@ -228,6 +228,7 @@ namespace OrderProcessing
                     Id = order.Id,
                     Statuses = order.Statuses,
                     TotalOfOrder = order.TotalOfOrder,
+                    TypeOfPayment = order.TypeOfPayment,
                 }).ToArrayAsync();
             foreach (var order in response)
             {
@@ -268,14 +269,26 @@ namespace OrderProcessing
                     if (latestStatus != null)
                     {
                         latestStatus.Status = newStatus;
+                        if (newStatus == statusType[1] && selectedOrder.TotalOfOrder >= 2500)
+                        {
+                            if (selectedOrder.TypeOfPayment == "Cash on delivery")
+                            {
+                                Console.WriteLine("Order can not be proceeded. It will be returned to client!");
+                                latestStatus.Status = statusType[3];
+                            }
+
+                        }
+                        if (newStatus == statusType[2])
+                        {
+                            Console.WriteLine("Order will be sent.");
+                            Thread.Sleep(2000);
+                            Console.WriteLine("Order was send to client!");
+                            latestStatus.Status = "Sent";
+                        }
                     }
                     else
                     {
-                        selectedOrder.Statuses.Add(new OrderStatus
-                        {
-                            OrderId = selectedOrder.Id,
-                            Status = newStatus
-                        });
+                        latestStatus.Status = statusType[5];
                     }
                     await _context.SaveChangesAsync();
                     Console.WriteLine("Order status updated successfully.");
