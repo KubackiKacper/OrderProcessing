@@ -1,6 +1,6 @@
 # OrderProcessing
 ```diff
-## - WARNING
+- ## WARNING
 + text in green
 ! text in orange
 # text in gray
