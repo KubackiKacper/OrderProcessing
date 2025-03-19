@@ -1,8 +1,6 @@
 # OrderProcessing
 ```diff
-- ## WARNING
-+ text in green
-! text in orange
-# text in gray
-@@ text in purple (and bold)@@
+- WARNING!
+- IN ORDER TO DEBUG THIS APP YOU WILL HAVE TO MODIFY @@launchSettings.JSON FILE
+
 ```
