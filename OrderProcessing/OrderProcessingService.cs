@@ -10,17 +10,17 @@ using OrderProcessing.DataTransferObjects;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 namespace OrderProcessing
 {
-    public class OrderProcessing : IOrderProcessing
+    public class OrderProcessingService : IOrderProcessing
     {
         private readonly ApplicationDbContext _context;        
-        public OrderProcessing(ApplicationDbContext context)
+        public OrderProcessingService(ApplicationDbContext context)
         {
             _context = context;
         }
 
         public async Task<GetOrderDTO[]> GetOrders() 
         {
-            Console.Clear();
+            //Console.Clear();
             GetOrderDTO[] response = await _context.Orders
                 .Select(order => new GetOrderDTO
                 {
@@ -76,7 +76,7 @@ namespace OrderProcessing
         }
         public async Task<PlaceOrderDTO> PlaceNewOrder()
         {
-            Console.Clear();
+            //Console.Clear();
             Console.WriteLine("Specify, which product would You like to order");
 
             List<OrderProduct> orderProducts = new List<OrderProduct>();
@@ -219,7 +219,7 @@ namespace OrderProcessing
 
         public async Task<GetOrderDTO[]> UpdateOrderStatus()
         {
-            Console.Clear();
+            //Console.Clear();
             Console.WriteLine("Select order to update it's status");
 
             GetOrderDTO[] response = await _context.Orders

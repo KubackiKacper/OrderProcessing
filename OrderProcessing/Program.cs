@@ -15,7 +15,7 @@ namespace OrderProcessing
                 options.UseSqlite("Data Source=OrderProcessing.db")
                 .LogTo(s => System.Diagnostics.Debug.WriteLine(s))
                 .EnableSensitiveDataLogging(true))
-            .AddSingleton<IOrderProcessing, OrderProcessing>()
+            .AddSingleton<IOrderProcessing, OrderProcessingService>()
             .BuildServiceProvider();
 
             var orderProcessing = serviceProvider.GetService<IOrderProcessing>();
@@ -59,4 +59,5 @@ namespace OrderProcessing
             } while (true);
         }        
     }
+    
 }
