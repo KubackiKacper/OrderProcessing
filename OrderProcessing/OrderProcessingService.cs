@@ -17,7 +17,6 @@ namespace OrderProcessing
         {
             _context = context;
         }
-
         public async Task<GetOrderDTO[]> GetOrders() 
         {
             GetOrderDTO[] response = await _context.Orders
@@ -67,7 +66,7 @@ namespace OrderProcessing
                 DisplayMenu.ShowMenu();
                 return response;
             }
-        }  
+        }
         public async Task<GetProductsDTO[]> GetProducts()
         {
             GetProductsDTO[] response = await _context.Products

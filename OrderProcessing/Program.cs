@@ -31,12 +31,10 @@ namespace OrderProcessing
                 switch (validationOfUserinput)
                 {
                     case 1:
-                        //Console.WriteLine("work in progress");
                         await orderProcessing.PlaceNewOrder();
                         break;
 
                     case 2:
-                        //Console.WriteLine("work in progress");
                         await orderProcessing.UpdateOrderStatus();
                         break;
 

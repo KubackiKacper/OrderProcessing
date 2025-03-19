@@ -45,13 +45,22 @@ public class OrderProcessingTests
         }
         SeedDatabase();
     }
-
     private void SeedDatabase()
     {
         _context.Products.AddRange(new List<Product>
         {
-            new Product { Id = 1, ProductName = "Laptop", UnitPrice = 5000 },
-            new Product { Id = 2, ProductName = "Mouse", UnitPrice = 150 }
+            new Product 
+            { 
+                Id = 1, 
+                ProductName = "Laptop", 
+                UnitPrice = 5000 
+            },
+            new Product 
+            { 
+                Id = 2, 
+                ProductName = "Mouse", 
+                UnitPrice = 150 
+            }
         });
 
         _context.Orders.Add(new Order
@@ -63,15 +72,22 @@ public class OrderProcessingTests
             TotalOfOrder = 5150,
             OrdersProducts = new List<OrderProduct>
             {
-                new OrderProduct { ProductId = 1, Quantity = 1 },
-                new OrderProduct { ProductId = 2, Quantity = 1 }
+                new OrderProduct 
+                { 
+                    ProductId = 1,
+                    Quantity = 1 
+                },
+                new OrderProduct 
+                { 
+                    ProductId = 2, 
+                    Quantity = 1 
+                }
             },
             Statuses = new List<OrderStatus>
             {
                 new OrderStatus { Status = "New" }
             }
         });
-
         _context.SaveChanges();
     }
 
